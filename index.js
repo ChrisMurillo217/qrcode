@@ -1,9 +1,28 @@
 const express = require( 'express' );
 const path = require( 'path' );
 const qrcode = require( 'qrcode' );
+const sql = require( 'mssql' ); // ultimo cambio
 
 const app = express();
 const port = process.env.port || 3000;
+
+//Configuracion de la BD
+const config = {
+  server: 'localhost',
+  database: 'pruebas_dev',
+  user: 'sa',
+  password: 'SaOr.ChMu2115',
+  port: 16450,
+  options: {
+    encrypt: true
+  }
+};
+
+// Establece la conexión a la base de datos
+sql.connect(config)
+  .then(() => console.log('Conexión exitosa a la BD'))
+  .catch(err => console.error('Error al conectar a la BD', err));
+//Configuraciones de BD ultimo cambio
 
 // Configuración de la aplicación
 app.use( express.json() );
