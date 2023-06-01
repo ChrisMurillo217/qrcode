@@ -54,7 +54,6 @@ function executeStatement() {
   // Ruta para generar y mostrar código QR
   app.post( '/scan', ( req, res, next ) => {
     const id = req.body.id;
-    console.log('ID recibido:', id);
     const qrSize = 500; // Perzonaliza el tamaño del código QR
   
     // Realiza la consulta a la base de datos para obtener la información del ID
@@ -66,20 +65,7 @@ function executeStatement() {
           console.log( err );
         } else if ( rowCount === 0 ) {
           res.send( 'No se encontró información para el ID' );
-        } /*else {
-          const qr_info = rows[ 0 ];
-          console.log( qr_info );
-          qrcode.toDataURL( id, { width: qrSize }, ( err, src ) => {
-            if ( err ) {
-              res.send( 'Algo salió mal al generar el código QR' );
-            } else {
-              res.render( 'scan', {
-                qr_code: src,
-                qr_info: qr_info,
-              });
-            }
-          });
-        }*/
+        }
       }
     );
 
@@ -102,31 +88,23 @@ function executeStatement() {
         res.send( 'No se encontró información para el ID' );
       } else {
         qr_info = rows[0];
-        qrcode.toDataURL( id, { width: qrSize }, ( err, src ) => {
+        const qr_text = `${ qr_info.id } - ${ qr_info.nombre }`;
+
+        qrcode.toDataURL( qr_text, { width: qrSize }, ( err, src ) => {
           if ( err ) {
             res.send( 'Algo salió mal al generar el código QR' );
           } else {
             res.render( 'scan', {
               qr_code: src,
               qr_info: qr_info,
+              qr_text: qr_text
             });
           }
         });
       }
     });
-    console.log( qr_info );
   
     connection.execSql( request );
-    /*qrcode.toDataURL( input_text, { width: qrSize }, ( err, src ) => {
-      if ( err ) {
-        res.send( 'Algo salió mal!!!' );
-      } else {
-      res.render( 'scan', {
-          qr_code: src,
-          qr_text: input_text // Agrega la información del código QR a los datos renderizados
-        });
-      }
-    });*/
   });
   
   //Inicia el servidor
