@@ -11,9 +11,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
+    "express-session": "^1.17.3",
     "mssql": "^9.1.1",
+    "node-sapb1": "^1.0.2",
+    "odbc": "^2.4.8",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
     "qrcode": "^1.4.4",
     "tedious": "^16.1.0"
   },
