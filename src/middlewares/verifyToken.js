@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
             if (err) {
                 res.status(401).json({ error: 'Token inválido' });
             } else {
-                req.user = decoded;
+                req.user = decoded; // Decodifica el token y agrega los datos del usuario al objeto de solicitud (req)
                 next();
             }
         });

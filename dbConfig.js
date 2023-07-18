@@ -4,7 +4,7 @@ const config = {
         type: 'default',
         options: {
             userName: 'qrcode',
-            password: 'Empaq.2023'
+            password: 'EmpaqQR2023'
         }
     },
     options: {

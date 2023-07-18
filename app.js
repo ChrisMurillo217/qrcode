@@ -7,17 +7,16 @@ const config = require( './dbConfig' );
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use( cors() );
-app.use( express.json() );
-app.use( express.urlencoded({ extended: false }) );
+app.use( cors() ); // Habilita CORS para permitir solicitudes desde otros dominios
+app.use( express.json() ); // Habilita el análisis de JSON en las solicitudes entrantes
+app.use( express.urlencoded({ extended: false }) ); // Habilita el análisis de URL codificadas en las solicitudes entrantes
 
 // Importa las rutas
 const routes = require( './src/routes' );
 
 // Configuración de la BD
 const connection = new Connection( config );
-
-connection.connect();
+connection.connect(); // Establece la conexión con la BD
 
 connection.on( 'connect', function ( err ) {
     if ( err ) {
@@ -26,7 +25,7 @@ connection.on( 'connect', function ( err ) {
         throw err;
     }
 
-    app.use( '/api', routes );
+    app.use( '/api', routes ); // Agrega las rutas a la aplicación Express
 
     app.listen( port, console.log( `Listening on port ${port}` ) );
 });
