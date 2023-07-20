@@ -22,9 +22,9 @@ exports.generateQR = ( req, res ) => {
             `SELECT * FROM ARTICULOS_QR WHERE ItemCode = '${id}'`,
             ( err, rowCount ) => {
                 if ( err ) {
-                    res.status( 500 ).json({ error: 'Algo salió mal con la consulta a la BD' });
+                    res.status( 500 ).json( { error: 'Algo salió mal con la consulta a la BD' } );
                 } else if (rowCount === 0) {
-                    res.status( 404 ).json({ error: 'No se encontró información para el ID' });
+                    res.status( 404 ).json( { error: 'No se encontró información para el ID' } );
                 }
             }
         );
@@ -42,14 +42,14 @@ exports.generateQR = ( req, res ) => {
 
         request.on( 'doneInProc', ( rowCount, more ) => {
             if ( rowCount === 0 ) {
-                res.status( 404 ).json({ error: 'No se encontró información para el ID' });
+                res.status( 404 ).json( { error: 'No se encontró información para el ID' } );
             } else {
                 qr_info = rows[0];
                 const qr_text = `${qr_info.ItemCode} - ${qr_info.ItemName}`;
 
                 qrcode.toDataURL( qr_text, { width: qrSize }, ( err, src ) => {
                     if ( err ) {
-                        res.status( 500 ).json({ error: 'Algo salió mal al generar el código QR' });
+                        res.status( 500 ).json( { error: 'Algo salió mal al generar el código QR' } );
                     } else {
                         res.json({
                             qr_code: src,

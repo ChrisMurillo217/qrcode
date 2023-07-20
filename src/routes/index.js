@@ -17,6 +17,15 @@ router.get( '/', ( req, res ) => {
 // Rutas de autenticación
 router.post( '/login', authenticationController.login );
 
+// Ruta para obtener las opciones de registro
+router.get( '/options', authenticationController.getOptions );
+
+// Ruta para obtener todos los usuarios
+router.get( '/getUsers', authenticationController.getUsers );
+
+// Ruta para registrar nuevos usuarios
+router.post( '/register', authenticationController.register );
+
 // Ruta protegida que requiere autenticación
 router.get( '/protected', verifyToken, protectedController.getProtectedData );
 

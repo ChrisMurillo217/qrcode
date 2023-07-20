@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000;
 
 app.use( cors() ); // Habilita CORS para permitir solicitudes desde otros dominios
 app.use( express.json() ); // Habilita el análisis de JSON en las solicitudes entrantes
-app.use( express.urlencoded({ extended: false }) ); // Habilita el análisis de URL codificadas en las solicitudes entrantes
+app.use( express.urlencoded( { extended: false } ) ); // Habilita el análisis de URL codificadas en las solicitudes entrantes
 
 // Importa las rutas
 const routes = require( './src/routes' );
