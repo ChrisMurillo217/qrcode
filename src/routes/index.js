@@ -26,6 +26,15 @@ router.post( '/register', authenticationController.register );
 // Ruta protegida que requiere autenticación
 router.get( '/protected', verifyToken, protectedController.getProtectedData );
 
+// Ruta para obtener la lista de usuarios
+router.get( '/users', authenticationController.getUsers );
+
+// Ruta para eliminar un usuario por su ID
+router.delete( '/users/:id', authenticationController.deleteUser );
+
+// Ruta para actualizar un usuario por su ID
+router.put( '/users/:id', authenticationController.updateUser );
+
 // Ruta para generar y mostrar código QR
 router.post( '/scan', scanController.generateQR );
 

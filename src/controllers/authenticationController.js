@@ -74,7 +74,6 @@ exports.login = ( req, res ) => {
 // Exportar el controlador para registrar un usuario
 exports.register = ( req, res ) => {
     const { name, username, password, mail, id_area, id_role } = req.body;
-    const encryptedPassword = encryptPassword( password ); // Encriptar la contraseña
 
     const connection = new Connection( config );
     connection.connect();
@@ -105,6 +104,8 @@ exports.register = ( req, res ) => {
 
 // Obtener opciones para id_role e id_area
 exports.getOptions = ( req, res ) => {
+    const options = {};
+
     const connection = new Connection( config );
     connection.connect();
   
@@ -154,8 +155,8 @@ exports.getOptions = ( req, res ) => {
                     areaRequest.on('doneInProc', () => {
                         connection.close();
                         res.json({
-                          roles: roles,
-                          areas: areas,
+                            roles: roles,
+                            areas: areas
                         });
                     });
 
@@ -165,5 +166,137 @@ exports.getOptions = ( req, res ) => {
         );
     
         connection.execSql( roleRequest );
+    });
+};
+
+// Obtener la lista de usuarios
+exports.getUsers = ( req, res ) => {
+    const connection = new Connection( config );
+    connection.connect();
+
+    connection.on( 'connect', function( err ) {
+        if ( err ) {
+            console.error( 'Error al conectar a la BD:', err.message );
+            console.log( err );
+            throw err;
+        }
+        const request = new Request(
+            `SELECT * FROM Users`,
+            ( err, rowCount ) => {
+                if ( err ) {
+                    console.error( 'Error al obtener la lista de usuarios:', err.message );
+                    res.status( 500 ).json( { error: 'Algo salió mal al obtener la lista de usuarios' } );
+                } else {
+                    connection.close();
+                }
+            }
+        );
+
+        const users = [];
+
+        request.on( 'row', ( columns ) => {
+            const user = {};
+            columns.forEach( ( column ) => {
+                user[column.metadata.colName] = column.value;
+            });
+            users.push( user );
+        });
+
+        request.on( 'doneInProc', () => {
+            res.json( users );
+        });
+
+        connection.execSql( request );
+    });
+};
+
+// Eliminar un usuario por su ID
+exports.deleteUser = ( req, res ) => {
+    const { id } = req.params;
+
+    const connection = new Connection( config );
+
+    const connectPromise = new Promise((resolve, reject) => {
+        connection.on('connect', (err) => {
+            if (err) {
+                console.error('Error al conectar a la BD:', err.message);
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+        connection.connect();
+    });
+
+    connectPromise.then(() => {
+        // Ahora que la conexión está establecida, creamos y ejecutamos la consulta para eliminar el usuario
+        const request = new Request(
+            `DELETE FROM Users WHERE id_user = ${id}`,
+            ( err, rowCount ) => {
+                if ( err ) {
+                    console.error( 'Error al eliminar el usuario:', err.message );
+                    res.status( 500 ).json( { error: 'Algo salió mal al eliminar el usuario' } );
+                } else {
+                    connection.close();
+                    res.json( { message: 'Usuario eliminado exitosamente' } );
+                }
+            }
+        );
+
+        connection.execSql( request );
+    }).catch( ( err ) => {
+        res.status( 500 ).json( { error: 'Error al conectar a la base de datos' } );
+    });
+};
+
+// Exportar el controlador para actualizar un usuario por su ID
+exports.updateUser = ( req, res ) => {
+    // Recoger los parametros del front
+    const { id } = req.params;
+    const { name, password, mail, id_area, id_role } = req.body;
+    
+    const connection = new Connection( config );
+    connection.connect();
+    
+    connection.on( 'connect', function ( err ) {
+        if ( err ) {
+            console.error( 'Error al conectar a la BD:', err.message );
+            console.log( err );
+            throw err;
+        }
+        
+        const getUserQuery = `SELECT * FROM Users WHERE id_user = ${id}`; // Obtiene el usuario actual
+        
+        const request = new Request( getUserQuery, ( err, rowCount ) => {
+            if ( err ) {
+                console.error( 'Error al obtener el usuario:', err.message );
+                res.status( 500 ).json( { error: 'Algo salió mal al obtener el usuario' } );
+            } else if ( rowCount === 0 ) {
+                connection.close();
+                res.status( 404 ).json( { error: 'No se encontró un usuario con el ID proporcionado' } );
+            }
+        });
+
+        const updateUserQuery = `UPDATE Users
+        SET name = '${name}',
+            mail = '${mail}',
+            id_area = ${id_area},
+            id_role = ${id_role}
+        WHERE id_user = ${id}
+        `;
+        
+        request.on( 'doneInProc', () => {
+            connection.execSql( new Request( updateUserQuery, ( err, rowCount ) => {
+                if ( err ) {
+                    console.error( 'Error al actualizar el usuario:', err.message );
+                    res.status( 500 ).json( { error: 'Algo salió mal al actualizar el usuario' } );
+                } else {
+                    connection.close();
+                    res.json( { message: 'Usuario actualizado exitosamente' } );
+                }
+            }));
+        });
+    
+        connection.execSql( request );
     });
 };
